@@ -38,7 +38,7 @@ from mower_sdk.navimow import Navimow
 from mower_sdk.sdk import NavimowSDK
 from mower_sdk.state_manager import StateManager
 
-__version__ = "0.1.0"
+__version__ = "0.1.3"
 
 __all__ = [
     # Main client

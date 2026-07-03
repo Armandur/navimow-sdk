@@ -372,6 +372,45 @@ class MowerAPI:
         """同步查询指令执行结果。"""
         return asyncio.run(self.async_query_command_results(devices))
 
+    async def async_get_command_result(
+        self, device_id: str, cmd_num: str | None = None
+    ) -> dict[str, Any] | None:
+        """Query the latest command execution result for one device.
+
+        异步查询单个设备的指令执行结果。
+
+        Convenience wrapper around ``async_query_command_results`` for the
+        common single-device case.
+
+        Args:
+            device_id: Device ID
+            device_id: 设备 ID
+            cmd_num: Optional command number to query a specific command
+            cmd_num: 可选的命令编号，用于查询特定指令
+
+        Returns:
+            The result entry for the device, or None if the response
+            contains no entry for it.
+
+        Raises:
+            MowerAPIError: If the request fails
+            MowerAPIError: 如果请求失败
+        """
+        query: dict[str, str] = {"id": device_id}
+        if cmd_num is not None:
+            query["cmdNum"] = cmd_num
+        results = await self.async_query_command_results([query])
+        for entry in results:
+            if entry.get("id") in (device_id, None):
+                return entry
+        return results[0] if results else None
+
+    def get_command_result(
+        self, device_id: str, cmd_num: str | None = None
+    ) -> dict[str, Any] | None:
+        """同步查询单个设备的指令执行结果。"""
+        return asyncio.run(self.async_get_command_result(device_id, cmd_num))
+
     def __del__(self):
         """清理资源。"""
         if hasattr(self, "_session") and self._session and not self._session.closed:
